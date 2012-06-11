@@ -1,3 +1,8 @@
+// ***
+// Fill in the blank plugin for jQuery
+// Author: Yane Frenski
+// ***
+
 // IE hack for indexOf
 if(!Array.indexOf){
   Array.prototype.indexOf = function(obj){
@@ -244,17 +249,28 @@ if(!Array.indexOf){
   /**** plugin parameters *****************************************************
   *****************************************************************************
   
-    * elementAnId:      String to change the id of the div with the answers.
+    * elementAnId:      String to change the id of the div id with the answers.
                         default: fillblank-ph
-    * elementTextId:    String to change the id of the div with the answers
+    * elementTextId:    String to change the id of the div id with the answers
                         default: fillblank-text
-    * textItems:        Array which comprises the texts in-between the blank
-                        spaces
+    * textItems:        Array which comprises the texts in-between the blanks.
+                        It should include all the text fragments except the 
+                        missing words (they are like separators of the texts)
+                        Should look like this: 
+                        ['text starts here','continues here', 'finishes here']
     * anItems:          Array with the strings, listing the possible answers
+                        Should look like this:
+                        ['answer 1', 'answer 2', 'answer 3']
     * anItemsCorrect:   Array with the correct items and their position in 
-                        the anItems array
-    * answerId:         The type of animation used when a card is clicked. 
-                        Can be 'flip', 'fade' and 'scroll'.
+                        the anItems array. Should look like this:
+                        [3,0,1] - means:
+                        on place 1 goes element 3
+                        on place 2 goes element 0
+                        on place 3 goes element 1
+                        (2 is missing as it's a wrong answer and fits nowhere)
+    * answerId:         String to change the class of the div with
+                        the answers to prevent any potential conflicts 
+                        in your code
     * phId:             String to change the class of the spans with the 
                         blank spaces to prevent any potential conflicts 
                         in your code. 
