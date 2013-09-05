@@ -67,5 +67,9 @@ Create the html for it. It is pretty simple and shows where text and the answer 
 * onFinishCall: A callback function. Will return object with three parameters: correct_answers, all_answers and time. You can add it when calling the plugin like this: onFinishCall: function(param){alert(param.correct_answers)}
 * allowTouchDrag: A boolean parameter (true or false), which enables dragging on touch devices. By default is true
 
+### License ###
+
+This plugin is [MIT](http://en.wikipedia.org/wiki/MIT_License) licensed.
+
 
 </body>

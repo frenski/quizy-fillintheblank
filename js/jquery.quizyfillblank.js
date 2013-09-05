@@ -1,7 +1,12 @@
 // ***
-// Fill in the blank plugin for jQuery
-// Author: Yane Frenski
+//  Memory game plugin for jQuery
+//  Author: Yane Frenski
+//  https://github.com/frenski/quizy-fillintheblank
+//
+//  (c) 2012-2013 http://yane.fr/
+//  MIT licensed
 // ***
+
 
 // IE hack for indexOf
 if(!Array.indexOf){
@@ -101,7 +106,7 @@ if(!Array.indexOf){
       
       // if the the number of dropped items is the same as the placeholders
       if(anCount == phNum){
-        // crears the timer
+        // clears the timer
         clearInterval(gameTimer);
         // shows the correct answers
         $('.'+opts.checkId).fadeIn();
