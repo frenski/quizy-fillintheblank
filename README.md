@@ -21,7 +21,7 @@ Download the [plugin](https://github.com/frenski/quizy-fillintheblank) and inclu
 ...
 </body>
 ```
-Add the css file to the head: 
+Add the css file to the head:
 
 ```html
 <head>
@@ -37,7 +37,7 @@ Call the plugin after all the script files and before the closing body tag like 
 <script>
     $('#tutorial-fillblank').quizyFillBlank({
       textItems:['Start of your text', '. text continues ', '. text continues here ', ', ... and here', 'and here it ends.'],
-          anItems:['Answer1', 'Answer2', 'Answer3', 'Answer4', 'Answer5', 'Answer6', 'Answer7' ], 
+          anItems:['Answer1', 'Answer2', 'Answer3', 'Answer4', 'Answer5', 'Answer6', 'Answer7' ],
           anItemsCorrect:[2,1,4,6],
           blockSize:150
         });
@@ -65,6 +65,7 @@ Create the html for it. It is pretty simple and shows where text and the answer 
 * numberId: String to change the class of the divs with the icons showing if the correct position of the item (in order to prevent any potential conflicts in your code). The default is d-number.
 * blockSize: The size of the answer divs and also the blank spaces. Change it if you have shorter or longer words than normal. Default is 100.
 * onFinishCall: A callback function. Will return object with three parameters: correct_answers, all_answers and time. You can add it when calling the plugin like this: onFinishCall: function(param){alert(param.correct_answers)}
+* onLoadCall: A callback function. Will trigger once all the quiz elements have been created and added to the DOM.
 * allowTouchDrag: A boolean parameter (true or false), which enables dragging on touch devices. By default is true
 
 ### License ###

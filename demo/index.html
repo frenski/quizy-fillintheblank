@@ -8,12 +8,12 @@
 
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="../css/quizyfillblank.css">
-  
+
   <style>
   body{
     font-family:Helvetica, Arial, Verdana;
   }
-  
+
   .text-style1{
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size:16px;
@@ -21,26 +21,26 @@
     text-align:center;
     line-height:24px;
   }
-  
+
   .text-style2{
     font-style:italic;
     color:#777;
   }
-  
+
   .text-style3{
     width:200px;
     margin:auto;
     font-family: Georgia, 'Times New Roman', Times, serif;
   }
   </style>
-  
+
 </head>
 <body>
 
   <h1>Quizy fill in the blank plugin</h1>
-  
+
   <div id="main" role="main">
-    
+
     <div id="tutorial-fillblank">
       <div class="text-style2">Drag the items to the correct blank spaces<br>(the correct answers will appear once you drag the last item)</div>
       <div id="fillblank-text" class='text-style1'></div><br><br>
@@ -52,11 +52,11 @@
   <script src="../js/jquery-ui-1.8.17.custom.min.js"></script>
 
   <script src="../js/jquery.quizyfillblank.min.js"></script>
-  
+
   <script>
     $('#tutorial-fillblank').quizyFillBlank({
           textItems:['The first president of the United States of America is', '. The longest serving president of the country is ', '. He was succeeded by ', ', who led the country till the end of the Second World War. The first afro-american to be elected for this position is', '.'],
-          anItems:['John Kennedy', 'Franklin Roosevelt', 'George Washington', 'Ronald Reagan', 'Harry Truman', 'Richard Nixon', 'Barack Obama' ], 
+          anItems:['John Kennedy', 'Franklin Roosevelt', 'George Washington', 'Ronald Reagan', 'Harry Truman', 'Richard Nixon', 'Barack Obama' ],
           anItemsCorrect:[2,1,4,6],
           blockSize:150
         });
