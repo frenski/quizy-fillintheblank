@@ -29,8 +29,11 @@
 
 /* Droppable elements styles */
 .quizy-fitb-droptarget{
-  font-size:18px;
-  padding-top:5px;
+  font-size: 18px;
+  padding-top: 5px;
+  display: inline-block;
+  padding: 2px 10px;
+  border-bottom: 1px solid #555;
 }
 
 .quizy-fitb-droptarget-hover{

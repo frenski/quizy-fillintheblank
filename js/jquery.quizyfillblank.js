@@ -59,10 +59,10 @@ if(!Array.indexOf){
     var el2 = $('#'+opts.elementTextId);
 
     // making the placeholder size
-    var placeHolder = '';
-    for(i=0;i<Math.round(opts.blockSize/10);i++){
-      placeHolder += '_';
-    }
+    // var placeHolder = '';
+    // for(i=0;i<Math.round(opts.blockSize/10);i++){
+    //   placeHolder += '_';
+    // }
 
 
     // FUNCTIONS **************************************************************
@@ -99,7 +99,7 @@ if(!Array.indexOf){
       }
 
       // starts the counter if it's the first time the user drops an element
-      if(anCount == 0) gameTimer = setInterval(incTime,1000);
+      if(anCount == 0) gameTimer = setInterval(incTime, 1000);
 
       // increases the total answer counter
       anCount++;
@@ -183,9 +183,10 @@ if(!Array.indexOf){
     // Adding the text and the placeholders (the drop-target places)
     for(var i=0; i<phNum; i++){
       el2.append('<span>'+textItems[i]+'</span> <span id="'+
-                  opts.phId+i+
-                  '" class="droppable-element quizy-fitb-droptarget">'+
-                  placeHolder+'</span> ');
+                  opts.phId +i +
+                  '" style="width:'+ opts.blockSize + 'px; height:' +
+                  opts.blockSizeHeight +
+                  'px; " class="droppable-element quizy-fitb-droptarget"></span>');
 
       // If it's the last drop item, adds one text more at the end
       if(i == phNum-1){
@@ -202,8 +203,8 @@ if(!Array.indexOf){
       elToAppend.append('<div id="'
                         +opts.answerId+i+
                         '" class="quizy-fitb-answer draggable-element '+
-                        'quizy-fitb-dropelement" style="width:'+
-                        opts.blockSize+'px">'+
+                        'quizy-fitb-dropelement" style="width:'+opts.blockSize+
+                        'px; height: '+opts.blockSizeHeight+'px;">'+
                         anItemsArr[i]+'</div>');
 
       // appends divs showing if the answers are correct (They will be hidden)
@@ -292,9 +293,13 @@ if(!Array.indexOf){
                         showing if the correct position of the item (in order
                         to prevent any potential conflicts in your code).
                         default: 'd-number'
-    * blockSize:        The size of the answer divs and also the blank spaces.
-                        Change it if you have shorter or longer words than normal
+    * blockSize:        The size (width) of the answer divs and also the blank
+                        spaces. Change it if you have shorter or longer words
+                        than normal
                         default: 100
+    * blockSizeHeight:  The height of the answer divs and also the blank spaces.
+                        Change it if you want to have somethin other than text.
+                        default: 10 (+padding in css)
     * allowTouchDrag:   A boolean parameter (true or false), which enables
                         dragging on touch devices.
                         default: true
@@ -308,6 +313,21 @@ if(!Array.indexOf){
 
   ****************************************************************************/
 
-  $.fn.quizyFillBlank.defaults = {elementAnId: 'fillblank-ph', textItems:['Text part1','text part 2', 'text part 3'], elementTextId: 'fillblank-text', anItems: ['an1','an2','an3'], anItemsCorrect:[2,0], answerId:'d-answer', phId: 'd-nest', checkId:'d-check', numberId:'d-number', blockSize:100, onFinishCall:'', onLoadCall:'', allowTouchDrag:true}
+  $.fn.quizyFillBlank.defaults = {
+    elementAnId: 'fillblank-ph',
+    textItems:['Text part1','text part 2', 'text part 3'],
+    elementTextId: 'fillblank-text',
+    anItems: ['an1','an2','an3'],
+    anItemsCorrect:[2,0],
+    answerId:'d-answer',
+    phId: 'd-nest',
+    checkId:'d-check',
+    numberId:'d-number',
+    blockSize:100,
+    blockSizeHeight:20,
+    onFinishCall:'',
+    onLoadCall:'',
+    allowTouchDrag:true
+  }
 
 })(jQuery);
