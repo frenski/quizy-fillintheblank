@@ -61,33 +61,44 @@ if(!Array.indexOf){
     var el1 = $('#'+opts.elementAnId);
     var el2 = $('#'+opts.elementTextId);
 
+    // keeps initial xy positions of the draggable items
     var anItemsInitPos = {};
+
+    // keeps track of the placeholders dragged positions
     var anDroppedTrack = {};
 
 
     // FUNCTIONS **************************************************************
     // ************************************************************************
 
+    // A helper function to check whether we are dealing with a touch devices
+    function isTouchDevice() {
+      return (('ontouchstart' in window) ||
+         (navigator.maxTouchPoints > 0) ||
+         (navigator.msMaxTouchPoints > 0));
+    }
+
     // Function that enables click event on objects that have already been
     // dragged with the idea to enable them to be put back
-
     function handleDraggedClick( event, elem ) {
       // If draggable is disabled - to prevent firing active/unassigned ones
       if(elem.draggable('option', 'disabled')) {
         // setting main variables
         var idAttr = elem.attr('id');
         var dragId = idAttr.substring(opts.answerId.length,idAttr.length);
-        var dropId = anDroppedTrack[dragId];
+        var dropId = anDroppedTrack[parseInt(dragId)];
         var dropElem = $('#' + opts.phId+dropId);
         // engables the drag again
         elem.draggable('enable');
         elem.draggable( 'option', 'revert', true );
         elem.removeClass('quizy-fitb-dropelement-disabled');
         // moves back the item to initial position
-        elem.offset(anItemsInitPos[elem.attr('id')]);
+        elem.offset(anItemsInitPos[idAttr]);
         dropElem.droppable( 'enable' );
         // decreases the answered items count
         anCount--;
+        // removes drop id assignment
+        anDroppedTrack[parseInt(dragId)] = null;
         // puts back the wrong answer icon and reduces the correct drops counter
         if(anItemsOrderArr[dropId]==dragId){
           $('#'+opts.checkId+dragId).addClass('quizy-fitb-res-no')
@@ -98,33 +109,17 @@ if(!Array.indexOf){
       }
     }
 
-    // Function for handling the dragging
-    function handleDragStop( event, ui ) {
-      var offsetXPos = parseInt( ui.offset.left );
-      var offsetYPos = parseInt( ui.offset.top );
-    }
-
-    // Function for handling the dragging
-    function handleDragStart( event, ui ) {
-      var offsetXPos = parseInt( ui.offset.left );
-      var offsetYPos = parseInt( ui.offset.top );
-      anItemsInitPos[$(this).attr('id')] = {top:offsetYPos, left:offsetXPos};
-    }
-
-    // Function for handling the dropping
-    function handleDropOn( event, ui ) {
-      // disables the draggable element and adds the necessary classes
-      var thisDropObj = $(this);
-      thisDropObj.droppable( 'disable' );
-      ui.draggable.addClass('quizy-fitb-dropelement-disabled');
-      ui.draggable.draggable( 'disable' );
-      ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
-      ui.draggable.draggable( 'option', 'revert', false );
+    function handleUndraggedTrigger (dragObj, dropObj) {
+      dropObj.droppable( 'disable' );
+      dragObj.addClass('quizy-fitb-dropelement-disabled');
+      dragObj.draggable( 'disable' );
+      dragObj.position( { of: dropObj, my: 'left top', at: 'left top' } );
+      dragObj.draggable( 'option', 'revert', false );
 
       // gets the corresponding id's of the droppabe and draggable elemts
-      var idAttr = thisDropObj.attr('id');
+      var idAttr = dropObj.attr('id');
       var dropId = idAttr.substring(opts.phId.length,idAttr.length);
-      idAttr = ui.draggable.attr('id');
+      idAttr = dragObj.attr('id');
       var dragId = idAttr.substring(opts.answerId.length,idAttr.length);
 
       // compares the ids and adds the necessary class if they match, meaning
@@ -137,7 +132,7 @@ if(!Array.indexOf){
       }
 
       // Keeping track of dropped positions of the dragged items
-      anDroppedTrack[dragId] = dropId;
+      anDroppedTrack[parseInt(dragId)] = parseInt(dropId);
 
       // starts the counter if it's the first time the user drops an element
       if (!timerStarted) {
@@ -162,7 +157,63 @@ if(!Array.indexOf){
                                      time: numSeconds } );
         }
         $('.draggable-element').off('click');
+        if (isTouchDevice()){
+          var dragEls = document.getElementsByClassName('draggable-element');
+          for(var i=0; i<dragEls.length; i++) {
+            unBindEvent(dragEls[i], "touchstart", handleTouchStart, true);
+          }
+        }
       }
+    }
+
+    // Function for handling the dragging
+    function handleDragStop( event, ui ) {
+      var offsetXPos = parseInt( ui.offset.left );
+      var offsetYPos = parseInt( ui.offset.top );
+    }
+
+    // Function for handling the dragging
+    function handleDragStart( event, ui ) {
+      var offsetXPos = parseInt( ui.offset.left );
+      var offsetYPos = parseInt( ui.offset.top );
+      anItemsInitPos[$(this).attr('id')] = {top:offsetYPos, left:offsetXPos};
+    }
+
+    // Function for handling the dropping
+    function handleDropOn( event, ui ) {
+      // disables the draggable element and adds the necessary classes
+      var thisDropObj = $(this);
+      var thisDragObj = ui.draggable;
+      handleUndraggedTrigger (thisDragObj, thisDropObj);
+    }
+
+    function handleTouchStart( e ) {
+      // gets main variables
+      var elem = e.target;
+      var idAttr = elem.getAttribute('id');
+      var dragId = idAttr.substring(opts.answerId.length, idAttr.length);
+      var dropId = anDroppedTrack[parseInt(dragId)];
+      var thisDragObj = $('#'+idAttr);
+      // if no drop has happened, the dropId is null
+      if (dropId === null) {
+        for (var i=0; i<phNum; i++) {
+          if (Object.values(anDroppedTrack).indexOf(i) == -1) {
+             dropId = i;
+             break;
+          }
+        }
+        var thisDropObj = $('#' + opts.phId+dropId);
+        var offsetXPos = parseInt( thisDragObj.offset().left );
+        var offsetYPos = parseInt( thisDragObj.offset().top );
+        anItemsInitPos[idAttr] = {top:offsetYPos, left:offsetXPos};
+        thisDragObj.offset({top:thisDropObj.offset.top, left:thisDropObj.offset.left});
+        handleUndraggedTrigger (thisDragObj, thisDropObj);
+      // else, dragged click handler is called
+      } else {
+        handleDraggedClick ( event, thisDragObj);
+      }
+
+
     }
 
     // Time increase function
@@ -174,10 +225,20 @@ if(!Array.indexOf){
 
     // Merging the attachEvent func of IE to the standard one
     function bindEvent(el, eventName, eventHandler, boolr) {
-      if (el.addEventListener){
+      if (el.addEventListener) {
         el.addEventListener(eventName, eventHandler, boolr);
-      } else if (el.attachEvent){
+      } else if (el.attachEvent) {
         el.attachEvent('on'+eventName, eventHandler);
+      }
+    }
+
+
+    // Merging the attachEvent func of IE to the standard one
+    function unBindEvent(el, eventName, eventHandler, boolr) {
+      if (el.removeEventListener) {
+        el.removeEventListener(eventName, eventHandler, boolr);
+      } else if (el.detachEvent) {
+        el.detachEvent('on'+eventName, eventHandler);
       }
     }
 
@@ -212,18 +273,16 @@ if(!Array.indexOf){
     // A Function to define the touch event
     function initTouch()
     {
-       bindEvent(document, "touchstart", touchHandler, true);
-       bindEvent(document, "touchmove", touchHandler, true);
-       bindEvent(document, "touchend", touchHandler, true);
-       bindEvent(document, "touchcancel", touchHandler, true);
+      bindEvent(document, "touchstart", touchHandler, true);
+      bindEvent(document, "touchmove", touchHandler, true);
+      bindEvent(document, "touchend", touchHandler, true);
+      bindEvent(document, "touchcancel", touchHandler, true);
     }
 
 
     // MAIN CODE **************************************************************
     // ************************************************************************
 
-    // if set, allows dragging in touch devices
-    if(opts.allowTouchDrag) initTouch();
 
     // Adding the text and the placeholders (the drop-target places)
     for(var i=0; i<phNum; i++){
@@ -262,6 +321,7 @@ if(!Array.indexOf){
                                       opts.checkId+'">'+
                                       (parseInt(anItemsOrderArr.indexOf(i))+1)+
                                       '</div>');
+      anDroppedTrack[i] = null;
     }
 
     // Adding drag functionality to the draggable elements (from jQuery UI)
@@ -283,6 +343,21 @@ if(!Array.indexOf){
       drop: handleDropOn,
       hoverClass: 'quizy-fitb-droptarget-hover'
     } );
+
+    // if set, allows dragging in touch devices
+    if (isTouchDevice()) {
+      if(opts.allowTouchDrag) {
+        initTouch();
+      } else {
+        // disbles the default click events
+        $('.draggable-element').off('click');
+        var dragEls = document.getElementsByClassName('draggable-element');
+        for(var i=0; i<dragEls.length; i++) {
+          bindEvent(dragEls[i], "touchstart", handleTouchStart, true);
+        }
+      }
+    }
+
 
     // Positions the results/correct answers to the draggable elements
     // and makes it right aligned to them
@@ -378,7 +453,7 @@ if(!Array.indexOf){
     blockSizeHeight:20,
     onFinishCall:'',
     onLoadCall:'',
-    allowTouchDrag:true
+    allowTouchDrag:false
   }
 
 })(jQuery);
