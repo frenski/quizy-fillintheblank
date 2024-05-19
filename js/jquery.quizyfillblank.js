@@ -54,19 +54,49 @@ if(!Array.indexOf){
     // a timer variable
     var gameTimer;
 
+    // a timer variable
+    var timerStarted = false;
+
     // DOM elements for the text and the draggable answers
     var el1 = $('#'+opts.elementAnId);
     var el2 = $('#'+opts.elementTextId);
 
-    // making the placeholder size
-    // var placeHolder = '';
-    // for(i=0;i<Math.round(opts.blockSize/10);i++){
-    //   placeHolder += '_';
-    // }
+    var anItemsInitPos = {};
+    var anDroppedTrack = {};
 
 
     // FUNCTIONS **************************************************************
     // ************************************************************************
+
+    // Function that enables click event on objects that have already been
+    // dragged with the idea to enable them to be put back
+
+    function handleDraggedClick( event, elem ) {
+      // If draggable is disabled - to prevent firing active/unassigned ones
+      if(elem.draggable('option', 'disabled')) {
+        // setting main variables
+        var idAttr = elem.attr('id');
+        var dragId = idAttr.substring(opts.answerId.length,idAttr.length);
+        var dropId = anDroppedTrack[dragId];
+        var dropElem = $('#' + opts.phId+dropId);
+        // engables the drag again
+        elem.draggable('enable');
+        elem.draggable( 'option', 'revert', true );
+        elem.removeClass('quizy-fitb-dropelement-disabled');
+        // moves back the item to initial position
+        elem.offset(anItemsInitPos[elem.attr('id')]);
+        dropElem.droppable( 'enable' );
+        // decreases the answered items count
+        anCount--;
+        // puts back the wrong answer icon and reduces the correct drops counter
+        if(anItemsOrderArr[dropId]==dragId){
+          $('#'+opts.checkId+dragId).addClass('quizy-fitb-res-no')
+                                    .removeClass('quizy-fitb-res-yes');
+          $('#'+opts.checkId+dragId).html('x'); //adds tick in place of 'x'
+          correctDrops --; //decreases the correct answers counter
+        }
+      }
+    }
 
     // Function for handling the dragging
     function handleDragStop( event, ui ) {
@@ -74,17 +104,25 @@ if(!Array.indexOf){
       var offsetYPos = parseInt( ui.offset.top );
     }
 
+    // Function for handling the dragging
+    function handleDragStart( event, ui ) {
+      var offsetXPos = parseInt( ui.offset.left );
+      var offsetYPos = parseInt( ui.offset.top );
+      anItemsInitPos[$(this).attr('id')] = {top:offsetYPos, left:offsetXPos};
+    }
+
     // Function for handling the dropping
     function handleDropOn( event, ui ) {
       // disables the draggable element and adds the necessary classes
-      $(this).droppable( 'disable' );
+      var thisDropObj = $(this);
+      thisDropObj.droppable( 'disable' );
       ui.draggable.addClass('quizy-fitb-dropelement-disabled');
       ui.draggable.draggable( 'disable' );
       ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
       ui.draggable.draggable( 'option', 'revert', false );
 
       // gets the corresponding id's of the droppabe and draggable elemts
-      var idAttr = $(this).attr('id');
+      var idAttr = thisDropObj.attr('id');
       var dropId = idAttr.substring(opts.phId.length,idAttr.length);
       idAttr = ui.draggable.attr('id');
       var dragId = idAttr.substring(opts.answerId.length,idAttr.length);
@@ -98,8 +136,14 @@ if(!Array.indexOf){
         correctDrops ++; //increases the correct answers counter
       }
 
+      // Keeping track of dropped positions of the dragged items
+      anDroppedTrack[dragId] = dropId;
+
       // starts the counter if it's the first time the user drops an element
-      if(anCount == 0) gameTimer = setInterval(incTime, 1000);
+      if (!timerStarted) {
+        gameTimer = setInterval(incTime, 1000);
+        timerStarted = true;
+      }
 
       // increases the total answer counter
       anCount++;
@@ -117,6 +161,7 @@ if(!Array.indexOf){
                                      all_answers:phNum,
                                      time: numSeconds } );
         }
+        $('.draggable-element').off('click');
       }
     }
 
@@ -154,7 +199,7 @@ if(!Array.indexOf){
       simulatedEvent.initMouseEvent(type, true, true, window, 1,
                               first.screenX, first.screenY,
                               first.clientX, first.clientY, false,
-                              false, false, false, 0/*left*/, null);
+                              false, false, false, 0, null);
 
       first.target.dispatchEvent(simulatedEvent);
 
@@ -224,8 +269,14 @@ if(!Array.indexOf){
       cursor: 'move',
       containment: 'document',
       stop: handleDragStop,
+      start: handleDragStart,
       revert: true
     } );
+
+
+    $('.draggable-element').on('click', function(e){
+      handleDraggedClick(e, $(this));
+    });
 
     // Adding drop functionality to the draggable elements (from jQuery UI)
     $('.droppable-element').droppable( {
