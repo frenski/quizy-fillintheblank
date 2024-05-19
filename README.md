@@ -66,7 +66,7 @@ Create the html for it. It is pretty simple and shows where text and the answer 
 * blockSize: The size of the answer divs and also the blank spaces. Change it if you have shorter or longer words than normal. Default is 100.
 * onFinishCall: A callback function. Will return object with three parameters: correct_answers, all_answers and time. You can add it when calling the plugin like this: onFinishCall: function(param){alert(param.correct_answers)}
 * onLoadCall: A callback function. Will trigger once all the quiz elements have been created and added to the DOM.
-* allowTouchDrag: A boolean parameter (true or false), which enables dragging on touch devices. By default is true
+* allowTouchDrag: A boolean parameter (true or false), which enables dragging on touch devices. By default is false
 
 ### License ###
 
